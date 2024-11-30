@@ -2,7 +2,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ReactNode } from 'react';
 import { MenuIcon } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
+import prisma from '../lib/db';
 import Logo from '@/public/logo.png';
 import { signOut } from '../lib/auth';
 import { requireUser } from '../lib/hooks';
@@ -12,15 +14,30 @@ import DashboardLinks from '../components/DashboardLinks';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+
+async function getData(userId: string) {
+  const data = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { userName: true },
+  });
+
+  if (!data?.userName) {
+    return redirect('/onboarding');
+  }
+
+  return data;
+}
 
 const DashboardLayout = async ({ children }: { children: ReactNode }) => {
   const session = await requireUser();
+
+  const data = await getData(session.user?.id as string);
 
   return (
     <>
