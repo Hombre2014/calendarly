@@ -4,38 +4,39 @@ generator client {
 
 datasource db {
   provider          = "postgresql"
-  url               = env("DATABASE_URL")
   directUrl         = env("DIRECT_URL")
+  url               = env("DATABASE_URL")
 }
 
 model User {
   id            String          @id @default(cuid())
-  name          String?
   email         String          @unique
-  emailVerified DateTime?
+  name          String?
   image         String?
+  userName      String?         @unique
   accounts      Account[]
   sessions      Session[]
+  emailVerified DateTime?
 
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }
 
 model Account {
-  userId            String
+  scope             String?
   type              String
+  userId            String
   provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  id_token          String?
   expires_at        Int?
   token_type        String?
-  scope             String?
-  id_token          String?
+  access_token      String?
+  refresh_token     String?
   session_state     String?
+  providerAccountId String
 
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -43,19 +44,19 @@ model Account {
 }
 
 model Session {
-  sessionToken String   @unique
   userId       String
   expires      DateTime
+  sessionToken String   @unique
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
 }
 
 model VerificationToken {
-  identifier String
   token      String
   expires    DateTime
+  identifier String
 
   @@id([identifier, token])
 }
