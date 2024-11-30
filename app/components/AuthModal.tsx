@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { GitHubAuthButton, GoogleAuthButton } from './SubmitButtons';
 import {
   Dialog,
-  DialogContent,
+  DialogTitle,
   DialogHeader,
+  DialogContent,
   DialogTrigger,
 } from '@/components/ui/dialog';
 
@@ -18,11 +19,13 @@ const AuthModal = () => {
         <Button>Try for Free</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[360px]">
-        <DialogHeader className="flex flex-row justify-center items-center gap-2">
-          <Image src={Logo} alt="Logo" className="size-10" />
-          <h4 className="text-3xl font-semibold">
-            <span className="text-primary">Calendarly</span>
-          </h4>
+        <DialogHeader>
+          <DialogTitle className="flex flex-row justify-center items-center gap-2">
+            <Image src={Logo} alt="Logo" className="size-10" />
+            <h4 className="text-3xl font-semibold">
+              <span className="text-primary">Calendarly</span>
+            </h4>
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col mt-5 gap-3">
           <form
