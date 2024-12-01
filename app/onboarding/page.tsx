@@ -6,16 +6,16 @@ import { parseWithZod } from '@conform-to/zod';
 import { useForm } from '@conform-to/react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { OnboardingAction } from '../actions';
-import { onboardingSchema } from '../lib/zodSchemas';
-import { SubmitButton } from '../components/SubmitButtons';
+import { OnboardingAction } from '@/app/actions';
+import { onboardingSchema } from '@/app/lib/zodSchemas';
+import { SubmitButton } from '@/app/components/SubmitButtons';
 import {
   Card,
-  CardContent,
-  CardDescription,
+  CardTitle,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardContent,
+  CardDescription,
 } from '@/components/ui/card';
 
 const OnboardingRoute = () => {

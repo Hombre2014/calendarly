@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
 
+import { cn } from '@/lib/utils';
 import GoogleLogo from '@/public/google.svg';
 import GitHubLogo from '@/public/github.svg';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface SubmitButtonProps {
   text: string;
