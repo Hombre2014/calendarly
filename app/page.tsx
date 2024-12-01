@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
-import Navbar from './components/Navbar';
-import { auth } from './lib/auth';
+
+import { auth } from '@/lib/auth';
+import Navbar from '../components/custom/Navbar';
 
 export default async function Home() {
   const session = await auth();

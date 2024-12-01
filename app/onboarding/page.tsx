@@ -7,8 +7,8 @@ import { useForm } from '@conform-to/react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { OnboardingAction } from '@/app/actions';
-import { onboardingSchema } from '@/app/lib/zodSchemas';
-import { SubmitButton } from '@/app/components/SubmitButtons';
+import { onboardingSchema } from '@/lib/zodSchemas';
+import { SubmitButton } from '@/components/custom/SubmitButtons';
 import {
   Card,
   CardTitle,

@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { redirect } from 'next/navigation';
 
-import prisma from '@/app/lib/db';
-import { requireUser } from '@/app/lib/hooks';
+import prisma from '@/lib/db';
+import { requireUser } from '@/lib/hooks';
 import { nylas, nylasConfig } from '@/lib/nylas';
 
 export async function GET(req: NextRequest) {
