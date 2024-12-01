@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { signIn } from '../lib/auth';
+import { signIn } from '@/lib/auth';
 import Logo from '@/public/logo.png';
 import { Button } from '@/components/ui/button';
 import { GitHubAuthButton, GoogleAuthButton } from './SubmitButtons';

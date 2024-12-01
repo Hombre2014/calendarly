@@ -4,13 +4,13 @@ import { ReactNode } from 'react';
 import { MenuIcon } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
-import prisma from '../lib/db';
+import prisma from '@/lib/db';
 import Logo from '@/public/logo.png';
-import { signOut } from '../lib/auth';
-import { requireUser } from '../lib/hooks';
+import { signOut } from '@/lib/auth';
+import { requireUser } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '../components/ThemeToggle';
-import DashboardLinks from '../components/DashboardLinks';
+import { ThemeToggle } from '../../components/custom/ThemeToggle';
+import DashboardLinks from '../../components/custom/DashboardLinks';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
   DropdownMenu,

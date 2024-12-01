@@ -1,5 +1,5 @@
-import { conformZodMessage } from '@conform-to/zod';
 import { z } from 'zod';
+import { conformZodMessage } from '@conform-to/zod';
 
 export const onboardingSchema = z.object({
   fullName: z.string().min(3).max(150),

@@ -3,9 +3,9 @@
 import { redirect } from 'next/navigation';
 import { parseWithZod } from '@conform-to/zod';
 
-import prisma from './lib/db';
-import { requireUser } from './lib/hooks';
-import { onboardingSchemaValidation } from './lib/zodSchemas';
+import prisma from '@/lib/db';
+import { requireUser } from '@/lib/hooks';
+import { onboardingSchemaValidation } from '../lib/zodSchemas';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function OnboardingAction(prevState: any, formData: FormData) {
