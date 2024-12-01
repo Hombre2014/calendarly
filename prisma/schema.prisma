@@ -13,7 +13,9 @@ model User {
   email         String          @unique
   name          String?
   image         String?
+  grantId       String?
   userName      String?         @unique
+  grantEmail    String?
   accounts      Account[]
   sessions      Session[]
   emailVerified DateTime?
