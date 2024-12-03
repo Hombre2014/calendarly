@@ -9,6 +9,7 @@ import Logo from '@/public/logo.png';
 import { signOut } from '@/lib/auth';
 import { requireUser } from '@/lib/hooks';
 import { Button } from '@/components/ui/button';
+import { Toaster } from '@/components/ui/sonner';
 import { ThemeToggle } from '../../components/custom/ThemeToggle';
 import DashboardLinks from '../../components/custom/DashboardLinks';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -124,6 +125,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
           </main>
         </div>
       </div>
+      <Toaster richColors closeButton />
     </>
   );
 };
