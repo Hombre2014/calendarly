@@ -90,7 +90,7 @@ const SettingsForm = ({ email, fullName, profileImage }: SettingsFormProps) => {
                 <img
                   alt="Profile Image"
                   src={currentProfileImage}
-                  className="rounded-lg size-16"
+                  className="rounded-lg"
                 />
                 <Button
                   type="button"

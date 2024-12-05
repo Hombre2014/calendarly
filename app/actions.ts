@@ -6,6 +6,7 @@ import { parseWithZod } from '@conform-to/zod';
 import prisma from '@/lib/db';
 import { requireUser } from '@/lib/hooks';
 import { onboardingSchemaValidation, settingsSchema } from '@/lib/zodSchemas';
+import { revalidatePath } from 'next/cache';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function OnboardingAction(prevState: any, formData: FormData) {
@@ -33,6 +34,19 @@ export async function OnboardingAction(prevState: any, formData: FormData) {
     data: {
       name: submission.value.fullName,
       userName: submission.value.userName,
+      availability: {
+        createMany: {
+          data: [
+            { day: 'Monday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Tuesday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Wednesday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Thursday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Friday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Saturday', fromTime: '09:00', tillTime: '18:00' },
+            { day: 'Sunday', fromTime: '09:00', tillTime: '18:00' },
+          ],
+        },
+      },
     },
   });
 
@@ -59,4 +73,40 @@ export async function SettingsAction(prevState: any, formData: FormData) {
   });
 
   return redirect('/dashboard');
+}
+
+export async function updateAvailabilityAction(formData: FormData) {
+  const session = await requireUser();
+
+  const rawData = Object.fromEntries(formData.entries());
+  const availabilityData = Object.keys(rawData)
+    .filter((key) => key.startsWith('id-'))
+    .map((key) => {
+      const id = key.replace('id-', '');
+      return {
+        id,
+        isActive: rawData[`isActive-${id}`] === 'on',
+        fromTime: rawData[`fromTime-${id}`] as string,
+        tillTime: rawData[`tillTime-${id}`] as string,
+      };
+    });
+
+  try {
+    await prisma.$transaction(
+      availabilityData.map((item) =>
+        prisma.availability.update({
+          where: { id: item.id },
+          data: {
+            isActive: item.isActive,
+            fromTime: item.fromTime,
+            tillTime: item.tillTime,
+          },
+        })
+      )
+    );
+
+    revalidatePath('/dashboard/availability');
+  } catch (error) {
+    console.error('Error updating availability:', error);
+  }
 }
