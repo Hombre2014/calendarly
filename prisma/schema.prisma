@@ -20,6 +20,7 @@ model User {
   sessions      Session[]
   emailVerified DateTime?
   availability  Availability[]
+  eventType     EventType[]
 
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
@@ -65,16 +66,16 @@ model VerificationToken {
 }
 
 model Availability {
-  id        String @id @default(uuid())
   day       Day
   fromTime  String
   tillTime  String
-  isActive  Boolean @default(true)
+  id        String   @id @default(uuid())
+  isActive  Boolean  @default(true)
 
+  userId    String?
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id]) // ", onDelete: Cascade" if needed
-  userId    String?
 }
 
 enum Day {
@@ -85,4 +86,18 @@ enum Day {
   Friday
   Saturday
   Sunday
+}
+
+model EventType {
+  duration          Int
+  id                String   @id @default(uuid())
+  url               String
+  title             String
+  active            Boolean  @default(true)
+  description       String
+  videoCallSoftware String   @default("Google Meet")
+
+  userId            String?
+  createdAt         DateTime @default(now())
+  User              User?    @relation(fields: [userId], references: [id]) // ", onDelete: Cascade" if needed
 }
