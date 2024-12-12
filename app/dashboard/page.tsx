@@ -1,7 +1,8 @@
-import EmptyState from '@/components/EmptyState';
+import { notFound } from 'next/navigation';
+
 import prisma from '@/lib/db';
 import { requireUser } from '@/lib/hooks';
-import { notFound } from 'next/navigation';
+import EmptyState from '@/components/EmptyState';
 
 async function getData(userId: string) {
   const data = await prisma.user.findUnique({
@@ -37,10 +38,10 @@ const DashboardPage = async () => {
         <p>No data</p>
       ) : (
         <EmptyState
+          href="/dashboard/new"
+          buttonText="Add event type"
           title="You have no Event Types"
           description="You can create your first event type by clicking the button below"
-          buttonText="Add event type"
-          href="/dashboard/new"
         />
       )}
     </>
