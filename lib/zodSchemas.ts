@@ -52,3 +52,11 @@ export const settingsSchema = z.object({
   profileImage: z.string(),
   fullName: z.string().min(3).max(150),
 });
+
+export const eventTypeSchema = z.object({
+  url: z.string().min(3).max(150),
+  title: z.string().min(3).max(150),
+  duration: z.number().min(15).max(60),
+  description: z.string().min(3).max(300),
+  videoCallSoftware: z.string().min(3).max(150),
+});
