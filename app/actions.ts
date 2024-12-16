@@ -119,8 +119,7 @@ export async function updateAvailabilityAction(formData: FormData) {
 }
 
 export async function CreateEventTypeAction(
-  // prevState: any,
-  prevState: Record<string, unknown>,
+  prevState: any,
   formData: FormData
 ) {
   const session = await requireUser();
