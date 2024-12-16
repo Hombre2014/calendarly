@@ -1,11 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+// import { useFormState } from 'react-dom';
+import { useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
+import { useActionState, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { eventTypeSchema } from '@/lib/zodSchemas';
+import { Textarea } from '@/components/ui/textarea';
+import { CreateEventTypeAction } from '@/app/actions';
 import ButtonGroup from '@/components/custom/ButtonGroup';
 import { SubmitButton } from '@/components/custom/SubmitButtons';
 import {
@@ -16,7 +22,6 @@ import {
   CardContent,
   CardDescription,
 } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectItem,
@@ -33,6 +38,20 @@ const NewEventRoute = () => {
   const [activePlatform, setActivePlatform] =
     useState<VideoCallProvider>('Google Meet');
 
+  const [lastResult, action] = useActionState(CreateEventTypeAction, undefined);
+  const [form, fields] = useForm({
+    lastResult,
+
+    onValidate({ formData }) {
+      return parseWithZod(formData, {
+        schema: eventTypeSchema,
+      });
+    },
+
+    shouldValidate: 'onBlur',
+    shouldRevalidate: 'onInput',
+  });
+
   return (
     <div className="flex w-full h-full flex-1 items-center justify-center">
       <Card>
@@ -42,11 +61,17 @@ const NewEventRoute = () => {
             Create new ent type that allows people to book you!
           </CardDescription>
         </CardHeader>
-        <form>
+        <form id={form.id} onSubmit={form.onSubmit} action={action} noValidate>
           <CardContent className="grid gap-y-5">
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="title">Title</Label>
-              <Input placeholder="30 minutes meeting" />
+              <Input
+                key={fields.title.key}
+                name={fields.title.name}
+                placeholder="30 minutes meeting"
+                defaultValue={fields.title.initialValue}
+              />
+              <p className="text-red-500 text-sm">{fields.title.errors}</p>
             </div>
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="url">URL Slug</Label>
@@ -55,18 +80,34 @@ const NewEventRoute = () => {
                   calendarly.com/
                 </span>
                 <Input
+                  key={fields.url.key}
+                  name={fields.url.name}
+                  placeholder="example-url"
                   className="rounded-l-none"
-                  placeholder="duration-meeting"
+                  defaultValue={fields.url.initialValue}
                 />
               </div>
+              <p className="text-red-500 text-sm">{fields.url.errors}</p>
             </div>
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea placeholder="Short 30 minutes meeting" />
+              <Textarea
+                key={fields.description.key}
+                name={fields.description.name}
+                placeholder="Short 30 minutes meeting"
+                defaultValue={fields.description.initialValue}
+              />
+              <p className="text-red-500 text-sm">
+                {fields.description.errors}
+              </p>
             </div>
             <div className="flex flex-col gap-y-2">
               <Label htmlFor="duration">Duration</Label>
-              <Select>
+              <Select
+                key={fields.duration.key}
+                name={fields.duration.name}
+                defaultValue={fields.duration.initialValue}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select duration" />
                 </SelectTrigger>
@@ -80,9 +121,15 @@ const NewEventRoute = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+              <p className="text-red-500 text-sm">{fields.duration.errors}</p>
             </div>
             <div className="flex flex-col gap-y-2">
               <Label>Video Call Provider</Label>
+              <input
+                type="hidden"
+                name="videoCallSoftware"
+                value={activePlatform}
+              />
               <ButtonGroup>
                 <Button
                   type="button"
@@ -117,6 +164,9 @@ const NewEventRoute = () => {
                   Microsoft Teams
                 </Button>
               </ButtonGroup>
+              <p className="text-red-500 text-sm">
+                {fields.videoCallSoftware.errors}
+              </p>
             </div>
           </CardContent>
           <CardFooter className="flex w-full justify-between">
