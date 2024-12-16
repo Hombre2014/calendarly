@@ -1,12 +1,16 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { parseWithZod } from '@conform-to/zod';
 
 import prisma from '@/lib/db';
 import { requireUser } from '@/lib/hooks';
-import { onboardingSchemaValidation, settingsSchema } from '@/lib/zodSchemas';
-import { revalidatePath } from 'next/cache';
+import {
+  settingsSchema,
+  eventTypeSchema,
+  onboardingSchemaValidation,
+} from '@/lib/zodSchemas';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function OnboardingAction(prevState: any, formData: FormData) {
@@ -53,7 +57,10 @@ export async function OnboardingAction(prevState: any, formData: FormData) {
   return redirect('/onboarding/grant-id');
 }
 
-export async function SettingsAction(prevState: any, formData: FormData) {
+export async function SettingsAction(
+  prevState: Record<string, unknown>,
+  formData: FormData
+) {
   const session = await requireUser();
 
   const submission = parseWithZod(formData, {
@@ -109,4 +116,32 @@ export async function updateAvailabilityAction(formData: FormData) {
   } catch (error) {
     console.error('Error updating availability:', error);
   }
+}
+
+export async function CreateEventTypeAction(
+  prevState: any,
+  formData: FormData
+) {
+  const session = await requireUser();
+
+  const submission = parseWithZod(formData, {
+    schema: eventTypeSchema,
+  });
+
+  if (submission.status !== 'success') {
+    return submission.reply();
+  }
+
+  await prisma.eventType.create({
+    data: {
+      userId: session.user?.id,
+      url: submission.value.url,
+      title: submission.value.title,
+      duration: submission.value.duration,
+      description: submission.value.description,
+      videoCallSoftware: submission.value.videoCallSoftware,
+    },
+  });
+
+  return redirect('/dashboard');
 }
