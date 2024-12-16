@@ -1,5 +1,5 @@
 import { Ban, PlusCircle } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import Link from 'next/link';
 
 interface EmptyStateProps {
