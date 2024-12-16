@@ -7,9 +7,9 @@ import { parseWithZod } from '@conform-to/zod';
 import prisma from '@/lib/db';
 import { requireUser } from '@/lib/hooks';
 import {
+  settingsSchema,
   eventTypeSchema,
   onboardingSchemaValidation,
-  settingsSchema,
 } from '@/lib/zodSchemas';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,7 +119,8 @@ export async function updateAvailabilityAction(formData: FormData) {
 }
 
 export async function CreateEventTypeAction(
-  prevState: any,
+  // prevState: any,
+  prevState: Record<string, unknown>,
   formData: FormData
 ) {
   const session = await requireUser();

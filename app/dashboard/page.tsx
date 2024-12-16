@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  ExternalLink,
-  Link2,
   Pen,
-  Settings,
   Trash,
+  Link2,
   Users2,
+  Settings,
+  ExternalLink,
 } from 'lucide-react';
 
 import prisma from '@/lib/db';
@@ -51,8 +51,6 @@ async function getData(userId: string) {
 const DashboardPage = async () => {
   const session = await requireUser();
   const data = await getData(session.user?.id as string);
-
-  console.log('Data: ', data);
 
   return (
     <>
