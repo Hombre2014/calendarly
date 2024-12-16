@@ -13,7 +13,7 @@ import prisma from '@/lib/db';
 import { requireUser } from '@/lib/hooks';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import EmptyState from '@/components/EmptyState';
+import EmptyState from '@/components/custom/EmptyState';
 import {
   DropdownMenu,
   DropdownMenuItem,
