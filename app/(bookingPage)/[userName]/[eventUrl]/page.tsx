@@ -1,7 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
-import prisma from '@/lib/db';
-import { CalendarX2, Clock, VideoIcon } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { CalendarX2, Clock, VideoIcon } from 'lucide-react';
+
+import prisma from '@/lib/db';
+import { Card, CardContent } from '@/components/ui/card';
 
 async function getData(eventUrl: string, userName: string) {
   const data = await prisma.eventType.findFirst({
@@ -14,9 +15,9 @@ async function getData(eventUrl: string, userName: string) {
     },
     select: {
       id: true,
-      description: true,
       title: true,
       duration: true,
+      description: true,
       videoCallSoftware: true,
       User: {
         select: {
@@ -43,9 +44,10 @@ async function getData(eventUrl: string, userName: string) {
 const BookingFormRoute = async ({
   params,
 }: {
-  params: { eventUrl: string; userName: string };
+  params: { userName: string; eventUrl: string };
 }) => {
-  const data = await getData(params.eventUrl, params.userName);
+  const { userName, eventUrl } = await params;
+  const data = await getData(eventUrl, userName);
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center">
