@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import { CalendarX2, Clock, VideoIcon } from 'lucide-react';
 
 import prisma from '@/lib/db';
+import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
+import RenderCalendar from '@/components/bookingForm/RenderCalendar';
 
 async function getData(eventUrl: string, userName: string) {
   const data = await prisma.eventType.findFirst({
@@ -52,7 +54,8 @@ const BookingFormRoute = async ({
   return (
     <div className="min-h-screen w-screen flex items-center justify-center">
       <Card className="max-w-[1000px] w-full mx-auto">
-        <CardContent className="p-5 md:grid md-grid-cols-[1fr, auto, 1fr, auto, 1fr]">
+        {/* <CardContent className="p-5 md:grid md-grid-cols-[1fr, auto, 1fr, auto, 1fr]"> */}
+        <CardContent className="p-5 grid md:grid-cols-[1fr,auto,1fr] gap-4">
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -88,6 +91,11 @@ const BookingFormRoute = async ({
               </p>
             </div>
           </div>
+          <Separator
+            orientation="vertical"
+            className="hidden md:block h-full w-[1px]"
+          />
+          <RenderCalendar availability={data.User?.availability as never} />
         </CardContent>
       </Card>
     </div>
