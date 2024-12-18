@@ -4,6 +4,7 @@ import { CalendarX2, Clock, VideoIcon } from 'lucide-react';
 import prisma from '@/lib/db';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
+import TimeTable from '@/components/bookingForm/TimeTable';
 import RenderCalendar from '@/components/bookingForm/RenderCalendar';
 
 async function getData(eventUrl: string, userName: string) {
@@ -45,17 +46,27 @@ async function getData(eventUrl: string, userName: string) {
 
 const BookingFormRoute = async ({
   params,
+  searchParams,
 }: {
   params: { userName: string; eventUrl: string };
+  searchParams: { date?: string };
 }) => {
   const { userName, eventUrl } = await params;
   const data = await getData(eventUrl, userName);
+  const selectedDate = searchParams.date
+    ? new Date(searchParams.date)
+    : new Date();
+
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(selectedDate);
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center">
       <Card className="max-w-[1000px] w-full mx-auto">
-        {/* <CardContent className="p-5 md:grid md-grid-cols-[1fr, auto, 1fr, auto, 1fr]"> */}
-        <CardContent className="p-5 grid md:grid-cols-[1fr,auto,1fr] gap-4">
+        <CardContent className="p-5 grid md:grid-cols-[1fr,auto,1fr,auto,1fr] gap-4">
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -74,7 +85,7 @@ const BookingFormRoute = async ({
               <p className="flex items-center gap-x-2">
                 <CalendarX2 className="size-4 mr-2 text-primary" />
                 <span className="text-sm font-medium text-muted-foreground">
-                  23. Sept 2024
+                  {formattedDate}
                 </span>
               </p>
               <p className="flex items-center gap-x-2">
@@ -96,6 +107,14 @@ const BookingFormRoute = async ({
             className="hidden md:block h-full w-[1px]"
           />
           <RenderCalendar availability={data.User?.availability as never} />
+          <Separator
+            orientation="vertical"
+            className="hidden md:block h-full w-[1px]"
+          />
+          <TimeTable
+            selectedDate={selectedDate}
+            userName={await params.userName}
+          />
         </CardContent>
       </Card>
     </div>
