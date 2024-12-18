@@ -3,7 +3,7 @@ import { CalendarState } from 'react-stately';
 import { useCalendarCell, useFocusRing, mergeProps } from 'react-aria';
 import {
   isToday,
-  // isSameMonth,
+  isSameMonth,
   CalendarDate,
   getLocalTimeZone,
 } from '@internationalized/date';
@@ -11,31 +11,25 @@ import {
 import { cn } from '@/lib/utils';
 
 const CalendarCell = ({
-  state,
   date,
+  state,
+  currentMonth,
   isUnavailable,
-}: // currentMonth,
-{
+}: {
   date: CalendarDate;
   state: CalendarState;
   isUnavailable?: boolean;
   currentMonth: CalendarDate;
 }) => {
   const ref = useRef(null);
-  const {
-    cellProps,
-    isDisabled,
-    isSelected,
-    buttonProps,
-    formattedDate,
-    isOutsideVisibleRange,
-  } = useCalendarCell({ date }, state, ref);
+  const { cellProps, isDisabled, isSelected, buttonProps, formattedDate } =
+    useCalendarCell({ date }, state, ref);
 
   const focusProps = useFocusRing();
   const { isFocusVisible } = useFocusRing();
   const isDateToday = isToday(date, getLocalTimeZone());
   const finallyIsDisabled = isDisabled || isUnavailable;
-  // const isOutsideOfMount = !isSameMonth(date, currentMonth);
+  const isOutsideOfMount = !isSameMonth(date, currentMonth);
 
   return (
     <td
@@ -44,7 +38,7 @@ const CalendarCell = ({
     >
       <div
         ref={ref}
-        hidden={isOutsideVisibleRange}
+        hidden={isOutsideOfMount}
         {...mergeProps(buttonProps, focusProps)}
         className="size-10 sm:size-12 outline-none group rounded-md"
       >
