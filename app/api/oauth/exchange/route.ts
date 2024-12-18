@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     await prisma.user.update({
       where: { id: session.user?.id },
       data: {
-        email,
-        grantId,
+        grantId: grantId,
+        grantEmail: email,
       },
     });
   } catch (error) {
