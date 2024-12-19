@@ -9,9 +9,9 @@ const Navbar = () => {
     <div className="flex py-5 items-center justify-between">
       <Link href="/" className="flex items-center gap-2">
         <Image src={Logo} alt="Logo" className="size-10" />
-        <h3 className="text-3xl font-semibold">
+        <span className="text-3xl font-semibold">
           <span className="text-primary">Calendarly</span>
-        </h3>
+        </span>
       </Link>
       <AuthModal />
     </div>
