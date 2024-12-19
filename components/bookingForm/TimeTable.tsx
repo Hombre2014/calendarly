@@ -40,8 +40,8 @@ async function getData(userName: string, selectedDate: Date) {
       id: true,
       User: {
         select: {
-          grantEmail: true,
           grantId: true,
+          grantEmail: true,
         },
       },
     },
