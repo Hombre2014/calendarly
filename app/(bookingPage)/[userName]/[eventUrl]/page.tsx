@@ -112,6 +112,7 @@ const BookingFormRoute = async ({
             className="hidden md:block h-full w-[1px]"
           />
           <TimeTable
+            duration={data.duration}
             selectedDate={selectedDate}
             userName={await params.userName}
           />

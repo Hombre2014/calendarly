@@ -22,9 +22,9 @@ const AuthModal = () => {
         <DialogHeader>
           <DialogTitle className="flex flex-row justify-center items-center gap-2">
             <Image src={Logo} alt="Logo" className="size-10" />
-            <h4 className="text-3xl font-semibold">
+            <span className="text-3xl font-semibold">
               <span className="text-primary">Calendarly</span>
-            </h4>
+            </span>
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col mt-5 gap-3">
