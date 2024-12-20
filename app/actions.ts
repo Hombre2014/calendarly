@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { parseWithZod } from '@conform-to/zod';
 
 import prisma from '@/lib/db';
+import { nylas } from '@/lib/nylas';
 import { requireUser } from '@/lib/hooks';
 import {
   settingsSchema,
@@ -119,6 +120,7 @@ export async function updateAvailabilityAction(formData: FormData) {
 }
 
 export async function CreateEventTypeAction(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   prevState: any,
   formData: FormData
 ) {
@@ -144,4 +146,112 @@ export async function CreateEventTypeAction(
   });
 
   return redirect('/dashboard');
+}
+
+export async function CreateMeetingAction(formData: FormData) {
+  const getUserData = await prisma.user.findUnique({
+    where: {
+      userName: formData.get('userName') as string,
+    },
+    select: {
+      grantId: true,
+      grantEmail: true,
+    },
+  });
+
+  if (!getUserData) {
+    throw new Error('User not found');
+  }
+
+  const eventTypeData = await prisma.eventType.findUnique({
+    where: {
+      id: formData.get('eventTypeId') as string,
+    },
+    select: {
+      title: true,
+      duration: true,
+      description: true,
+      videoCallSoftware: true,
+    },
+  });
+
+  const fromTime = formData.get('fromTime') as string;
+  const provider = formData.get('provider') as string;
+  const eventDate = formData.get('eventDate') as string;
+  const meetingLength = Number(formData.get('meetingLength'));
+  const startDateTime = new Date(`${eventDate}T${fromTime}:00`);
+  const endDateTime = new Date(startDateTime.getTime() + meetingLength * 60000);
+
+  console.log('Provider: ', provider);
+  console.log('Grant ID:', getUserData.grantId);
+  console.log('Calendar details:', getUserData.grantEmail);
+
+  // First get the calendars list
+  const calendars = await nylas.calendars.list({
+    identifier: getUserData.grantId as string,
+  });
+
+  // Get the first calendar ID
+  const calendarId = calendars.data[0].id;
+  console.log('Calendar ID:', calendarId);
+
+  await nylas.events.create({
+    identifier: getUserData.grantId as string,
+    requestBody: {
+      calendarId: calendarId,
+      title: eventTypeData?.title,
+      description: eventTypeData?.description,
+      when: {
+        startTime: Math.floor(startDateTime.getTime() / 1000),
+        endTime: Math.floor(endDateTime.getTime() / 1000),
+      },
+      conferencing: {
+        autocreate: {
+          scope: 'OnlineMeetings.ReadWrite',
+        },
+        provider: provider as any,
+      },
+      participants: [
+        {
+          status: 'yes',
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+        },
+      ],
+    },
+    queryParams: {
+      calendarId: calendarId,
+      notifyParticipants: true,
+    },
+  });
+
+  // await nylas.events.create({
+  //   identifier: getUserData.grantId as string,
+  //   requestBody: {
+  //     title: eventTypeData?.title,
+  //     description: eventTypeData?.description,
+  //     when: {
+  //       startTime: Math.floor(startDateTime.getTime() / 1000),
+  //       endTime: Math.floor(endDateTime.getTime() / 1000),
+  //     },
+  //     conferencing: {
+  //       autocreate: {},
+  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //       provider: provider as any,
+  //     },
+  //     participants: [
+  //       {
+  //         status: 'yes',
+  //         name: formData.get('name') as string,
+  //         email: formData.get('email') as string,
+  //       },
+  //     ],
+  //   },
+  //   queryParams: {
+  //     calendarId: getUserData.grantId as string,
+  //     notifyParticipants: true,
+  //   },
+  // });
+
+  return redirect('/success');
 }
