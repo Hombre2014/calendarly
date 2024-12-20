@@ -156,6 +156,7 @@ export async function CreateMeetingAction(formData: FormData) {
     },
     select: {
       grantId: true,
+      name: true,
       grantEmail: true,
       microsoftToken: true,
       zoomToken: true,
@@ -220,7 +221,34 @@ export async function CreateMeetingAction(formData: FormData) {
   };
 
   // Create the event with Nylas
-  await nylas.events.create({
+
+  console.log('Form Data:', {
+    guestEmail: formData.get('email'),
+    guestName: formData.get('name'),
+  });
+
+  type ParticipantStatus = 'yes' | 'no' | 'maybe' | 'noreply';
+
+  const participants: {
+    email: string;
+    name: string;
+    status: ParticipantStatus;
+  }[] = [
+    {
+      email: getUserData.grantEmail as string,
+      name: getUserData.name || 'Host',
+      status: 'yes',
+    },
+    {
+      email: formData.get('email') as string,
+      name: formData.get('name') as string,
+      status: 'yes',
+    },
+  ];
+
+  console.log('Participants:', participants);
+
+  const eventResponse = await nylas.events.create({
     identifier: getUserData.grantId as string,
     requestBody: {
       calendarId: calendarId,
@@ -233,19 +261,15 @@ export async function CreateMeetingAction(formData: FormData) {
       conferencing: getConferencingSetup(
         getUserData.calendarProvider || 'google'
       ),
-      participants: [
-        {
-          status: 'yes',
-          name: formData.get('name') as string,
-          email: formData.get('email') as string,
-        },
-      ],
+      participants: participants,
     },
     queryParams: {
       calendarId: calendarId,
       notifyParticipants: true,
     },
   });
+
+  console.log('Nylas Event Response:', JSON.stringify(eventResponse, null, 2));
 
   return redirect('/success');
 }
