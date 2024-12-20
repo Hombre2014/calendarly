@@ -15,12 +15,6 @@ export async function GET(req: NextRequest) {
     return Response.json('No code provided', { status: 400 });
   }
 
-  const scopes = {
-    google: ['calendar.events'],
-    microsoft: ['calendar.events', 'OnlineMeetings.ReadWrite'],
-    zoom: ['calendar.events', 'meeting:write:meeting', 'user:read:user'],
-  };
-
   try {
     const response = await nylas.auth.exchangeCodeForToken({
       code,

@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { parseWithZod } from '@conform-to/zod';
-import type { CreateEventRequest } from 'nylas/lib/types/models/events';
+import type { CreateEventRequest } from 'nylas';
 
 import prisma from '@/lib/db';
 import { nylas } from '@/lib/nylas';
@@ -73,7 +73,7 @@ export async function SettingsAction(
     return submission.reply();
   }
 
-  const user = await prisma.user.update({
+  await prisma.user.update({
     where: { id: session.user?.id },
     data: {
       name: submission.value.fullName,
@@ -85,7 +85,7 @@ export async function SettingsAction(
 }
 
 export async function updateAvailabilityAction(formData: FormData) {
-  const session = await requireUser();
+  await requireUser();
 
   const rawData = Object.fromEntries(formData.entries());
   const availabilityData = Object.keys(rawData)
@@ -155,11 +155,11 @@ export async function CreateMeetingAction(formData: FormData) {
       userName: formData.get('userName') as string,
     },
     select: {
-      grantId: true,
       name: true,
+      grantId: true,
+      zoomToken: true,
       grantEmail: true,
       microsoftToken: true,
-      zoomToken: true,
       calendarProvider: true,
     },
   });
@@ -192,8 +192,6 @@ export async function CreateMeetingAction(formData: FormData) {
 
   const calendarId = calendars.data[0].id;
 
-  // type ConferencingProvider = 'google' | 'microsoft' | 'zoom';
-
   const getConferencingSetup = (
     calendarProvider: string
   ): CreateEventRequest['conferencing'] => {
@@ -220,13 +218,6 @@ export async function CreateMeetingAction(formData: FormData) {
     return undefined;
   };
 
-  // Create the event with Nylas
-
-  console.log('Form Data:', {
-    guestEmail: formData.get('email'),
-    guestName: formData.get('name'),
-  });
-
   type ParticipantStatus = 'yes' | 'no' | 'maybe' | 'noreply';
 
   const participants: {
@@ -246,9 +237,7 @@ export async function CreateMeetingAction(formData: FormData) {
     },
   ];
 
-  console.log('Participants:', participants);
-
-  const eventResponse = await nylas.events.create({
+  await nylas.events.create({
     identifier: getUserData.grantId as string,
     requestBody: {
       calendarId: calendarId,
@@ -268,8 +257,6 @@ export async function CreateMeetingAction(formData: FormData) {
       notifyParticipants: true,
     },
   });
-
-  console.log('Nylas Event Response:', JSON.stringify(eventResponse, null, 2));
 
   return redirect('/success');
 }
