@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const session = await requireUser();
   const code = url.searchParams.get('code');
+  const provider = url.searchParams.get('provider') || 'google';
 
   if (!code) {
     return Response.json('No code provided', { status: 400 });
@@ -29,6 +30,10 @@ export async function GET(req: NextRequest) {
       data: {
         grantId: grantId,
         grantEmail: email,
+        calendarProvider: provider,
+        microsoftToken:
+          provider === 'microsoft' ? response.accessToken : undefined,
+        zoomToken: provider === 'zoom' ? response.accessToken : undefined,
       },
     });
   } catch (error) {

@@ -9,21 +9,24 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  name          String?
-  image         String?
-  grantId       String?
-  userName      String?         @unique
-  grantEmail    String?
-  accounts      Account[]
-  sessions      Session[]
-  emailVerified DateTime?
-  availability  Availability[]
-  eventType     EventType[]
+  id               String          @id @default(cuid())
+  email            String          @unique
+  name             String?
+  image            String?
+  grantId          String?
+  userName         String?         @unique
+  grantEmail       String?
+  accounts         Account[]
+  sessions         Session[]
+  emailVerified    DateTime?
+  zoomToken        String?
+  microsoftToken   String?
+  availability     Availability[]
+  eventType        EventType[]
+  calendarProvider String          @default("google")
 
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  updatedAt         DateTime       @updatedAt
+  createdAt         DateTime       @default(now())
 }
 
 model Account {

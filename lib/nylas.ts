@@ -10,4 +10,9 @@ export const nylasConfig = {
   clientId: process.env.NYLAS_CLIENT_ID!,
   apiKey: process.env.NYLAS_API_SECRET_KEY!,
   redirectUri: process.env.NEXT_PUBLIC_URL! + '/api/oauth/exchange',
+  scopes: {
+    google: ['calendar.events'],
+    microsoft: ['calendar.events', 'OnlineMeetings.ReadWrite'],
+    zoom: ['calendar.events', 'meeting:write:meeting', 'user:read:user'],
+  },
 };
