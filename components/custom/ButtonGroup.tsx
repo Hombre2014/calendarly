@@ -1,5 +1,6 @@
 'use client';
 
+import { v4 as uuidv4 } from 'uuid';
 import { Children, cloneElement, ReactElement } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -14,7 +15,7 @@ const ButtonGroup = ({ className, children }: ButtonGroupProps) => {
   const totalButtons = Children.count(children);
 
   return (
-    <div className={cn('flex w-full', className)}>
+    <div className={cn('flex w-full', className)} key={uuidv4()}>
       {children.map((child, index) => {
         const isFirstItem = index === 0;
         const isLastItem = index === totalButtons - 1;

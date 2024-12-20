@@ -70,7 +70,6 @@ async function getData(userName: string, selectedDate: Date) {
 }
 
 // From Codi AI, not in the original code from the tutorial
-
 interface TimeSlot {
   object: string;
   status: string;
@@ -83,7 +82,6 @@ interface FreeBusyData {
   object: string;
   timeSlots: TimeSlot[];
 }
-
 // From Codi AI, not in the original code from the tutorial
 
 function calculateAvailableTimeSlots(
@@ -137,7 +135,7 @@ function calculateAvailableTimeSlots(
     );
   });
 
-  return freeSlots.map((slot) => format(slot, 'HH:mm a'));
+  return freeSlots.map((slot) => format(slot, 'HH:mm'));
 }
 
 const TimeTable = async ({
@@ -172,7 +170,10 @@ const TimeTable = async ({
       <div className="mt-3 max-h-[350px] overflow-y-auto">
         {availableSlots.length > 0 ? (
           availableSlots.map((slot, index) => (
-            <Link href="/" key={index}>
+            <Link
+              href={`?date=${format(selectedDate, 'yyyy-MM-dd')}&time=${slot}`}
+              key={index}
+            >
               <Button className="w-full mb-2" variant="outline">
                 {slot}
               </Button>
