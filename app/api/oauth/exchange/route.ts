@@ -9,10 +9,17 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const session = await requireUser();
   const code = url.searchParams.get('code');
+  const provider = url.searchParams.get('provider') || 'google';
 
   if (!code) {
     return Response.json('No code provided', { status: 400 });
   }
+
+  const scopes = {
+    google: ['calendar.events'],
+    microsoft: ['calendar.events', 'OnlineMeetings.ReadWrite'],
+    zoom: ['calendar.events', 'meeting:write:meeting', 'user:read:user'],
+  };
 
   try {
     const response = await nylas.auth.exchangeCodeForToken({
@@ -29,6 +36,10 @@ export async function GET(req: NextRequest) {
       data: {
         grantId: grantId,
         grantEmail: email,
+        calendarProvider: provider,
+        microsoftToken:
+          provider === 'microsoft' ? response.accessToken : undefined,
+        zoomToken: provider === 'zoom' ? response.accessToken : undefined,
       },
     });
   } catch (error) {

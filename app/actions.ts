@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { parseWithZod } from '@conform-to/zod';
+import type { CreateEventRequest } from 'nylas/lib/types/models/events';
 
 import prisma from '@/lib/db';
 import { nylas } from '@/lib/nylas';
@@ -156,6 +157,9 @@ export async function CreateMeetingAction(formData: FormData) {
     select: {
       grantId: true,
       grantEmail: true,
+      microsoftToken: true,
+      zoomToken: true,
+      calendarProvider: true,
     },
   });
 
@@ -176,25 +180,46 @@ export async function CreateMeetingAction(formData: FormData) {
   });
 
   const fromTime = formData.get('fromTime') as string;
-  const provider = formData.get('provider') as string;
   const eventDate = formData.get('eventDate') as string;
   const meetingLength = Number(formData.get('meetingLength'));
   const startDateTime = new Date(`${eventDate}T${fromTime}:00`);
   const endDateTime = new Date(startDateTime.getTime() + meetingLength * 60000);
 
-  console.log('Provider: ', provider);
-  console.log('Grant ID:', getUserData.grantId);
-  console.log('Calendar details:', getUserData.grantEmail);
-
-  // First get the calendars list
   const calendars = await nylas.calendars.list({
     identifier: getUserData.grantId as string,
   });
 
-  // Get the first calendar ID
   const calendarId = calendars.data[0].id;
-  console.log('Calendar ID:', calendarId);
 
+  // type ConferencingProvider = 'google' | 'microsoft' | 'zoom';
+
+  const getConferencingSetup = (
+    calendarProvider: string
+  ): CreateEventRequest['conferencing'] => {
+    // Only set up conferencing if it matches the event's calendar type
+    if (calendarProvider === 'microsoft') {
+      return {
+        provider: 'Microsoft Teams',
+        settings: {
+          access_token: getUserData.microsoftToken || undefined,
+        },
+      };
+    }
+
+    if (calendarProvider === 'zoom') {
+      return {
+        provider: 'Zoom Meeting',
+        settings: {
+          access_token: getUserData.zoomToken || undefined,
+        },
+      };
+    }
+
+    // Don't attempt to create Google Meet for non-Google calendars
+    return undefined;
+  };
+
+  // Create the event with Nylas
   await nylas.events.create({
     identifier: getUserData.grantId as string,
     requestBody: {
@@ -205,12 +230,9 @@ export async function CreateMeetingAction(formData: FormData) {
         startTime: Math.floor(startDateTime.getTime() / 1000),
         endTime: Math.floor(endDateTime.getTime() / 1000),
       },
-      conferencing: {
-        autocreate: {
-          scope: 'OnlineMeetings.ReadWrite',
-        },
-        provider: provider as any,
-      },
+      conferencing: getConferencingSetup(
+        getUserData.calendarProvider || 'google'
+      ),
       participants: [
         {
           status: 'yes',
@@ -224,34 +246,6 @@ export async function CreateMeetingAction(formData: FormData) {
       notifyParticipants: true,
     },
   });
-
-  // await nylas.events.create({
-  //   identifier: getUserData.grantId as string,
-  //   requestBody: {
-  //     title: eventTypeData?.title,
-  //     description: eventTypeData?.description,
-  //     when: {
-  //       startTime: Math.floor(startDateTime.getTime() / 1000),
-  //       endTime: Math.floor(endDateTime.getTime() / 1000),
-  //     },
-  //     conferencing: {
-  //       autocreate: {},
-  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       provider: provider as any,
-  //     },
-  //     participants: [
-  //       {
-  //         status: 'yes',
-  //         name: formData.get('name') as string,
-  //         email: formData.get('email') as string,
-  //       },
-  //     ],
-  //   },
-  //   queryParams: {
-  //     calendarId: getUserData.grantId as string,
-  //     notifyParticipants: true,
-  //   },
-  // });
 
   return redirect('/success');
 }
