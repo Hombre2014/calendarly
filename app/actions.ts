@@ -35,7 +35,7 @@ export async function OnboardingAction(prevState: any, formData: FormData) {
     return submission.reply();
   }
 
-  const data = await prisma.user.update({
+  await prisma.user.update({
     where: { id: session.user?.id },
     data: {
       name: submission.value.fullName,
@@ -195,11 +195,10 @@ export async function CreateMeetingAction(formData: FormData) {
   const getConferencingSetup = (
     calendarProvider: string
   ): CreateEventRequest['conferencing'] => {
-    // Only set up conferencing if it matches the event's calendar type
     if (calendarProvider === 'microsoft') {
       return {
         provider: 'Microsoft Teams',
-        settings: {
+        autocreate: {
           access_token: getUserData.microsoftToken || undefined,
         },
       };
@@ -208,13 +207,12 @@ export async function CreateMeetingAction(formData: FormData) {
     if (calendarProvider === 'zoom') {
       return {
         provider: 'Zoom Meeting',
-        settings: {
+        autocreate: {
           access_token: getUserData.zoomToken || undefined,
         },
       };
     }
 
-    // Don't attempt to create Google Meet for non-Google calendars
     return undefined;
   };
 
